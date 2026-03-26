@@ -162,14 +162,7 @@
 
   <nav id="nav">
     <a href="#" class="nav-logo">
-      <svg class="nav-logo-icon" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="18" cy="18" r="16" stroke="rgba(245,245,240,0.15)" stroke-width="2"/>
-        <circle cx="18" cy="18" r="16" fill="none" stroke="#f5f5f0" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="72 28" stroke-dashoffset="18"/>
-        <rect x="11" y="19" width="14" height="11" rx="2" fill="#f5f5f0"/>
-        <path d="M13 19 L13 15 Q13 11 18 11 Q23 11 23 15 L23 19" fill="none" stroke="#f5f5f0" stroke-width="2.2" stroke-linecap="round"/>
-        <circle cx="18" cy="23" r="1.5" fill="#080808"/>
-        <rect x="17" y="23.5" width="2" height="3" rx="0.5" fill="#080808"/>
-      </svg>
+      <img src="SeamlessIntegration.png" alt="Seamless Integrations" style="width:40px;height:40px;object-fit:contain;border-radius:50%;"/>
       <span class="nav-logo-text">Seamless <span>Integrations</span></span>
     </a>
     <ul class="nav-links">
@@ -181,16 +174,28 @@
   </nav>
 
   <section id="hero">
-    <div class="hero-left" style="display:flex; align-items:center; justify-content:center;">
-      <img src="SeamlessIntegration.png" alt="Seamless Integrations" style="width:100%; max-width:400px; object-fit:contain; opacity:0; animation:fadeIn 1s 0.4s forwards;"/>
-    </div>
-    <div class="hero-right" style="display:flex; flex-direction:column; gap:0; opacity:0; animation:fadeUp 0.7s 0.35s forwards;">
-      <p class="hero-label" style="opacity:1; animation:none;">Verkada Helix Integration Specialist</p>
-      <h1 class="hero-name" style="opacity:1; animation:none;">Connect.<br/><em>Search.</em><br/>Done.</h1>
-      <p class="hero-desc" style="opacity:1; animation:none;">Link your Square POS or Avigilon Alta access control to Verkada Helix. Search any transaction or door event and jump straight to the footage — in seconds, not hours.</p>
-      <div class="hero-cta" style="opacity:1; animation:none;">
+    <div class="hero-left">
+      <p class="hero-label">Verkada Helix Integration Specialist</p>
+      <h1 class="hero-name">Connect.<br/><em>Search.</em><br/>Done.</h1>
+      <p class="hero-desc">Link your Square POS or Avigilon Alta access control to Verkada Helix. Search any transaction or door event and jump straight to the footage — in seconds, not hours.</p>
+      <div class="hero-cta">
         <a href="https://tally.so/r/7RoVZR" target="_blank" class="btn">Get Started</a>
         <a href="#services" class="btn btn-ghost">See Services</a>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="badge-tag">Powered by AWS Lambda — Serverless</div>
+      <div class="stat-card">
+        <div class="stat-num">2–3s</div>
+        <div class="stat-label">From event to searchable footage</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">$0</div>
+        <div class="stat-label">Monthly AWS cost for most clients</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">0</div>
+        <div class="stat-label">Impact on existing systems</div>
       </div>
     </div>
   </section>
@@ -361,7 +366,7 @@
     <p class="contact-sub reveal">Fill out the intake form — takes under 2 minutes. We'll review your setup and get back to you within 24 hours with a confirmed quote.</p>
     <div class="contact-links reveal">
       <a href="https://tally.so/r/7RoVZR" target="_blank" class="btn">Start Intake Form</a>
-      <a href="/cdn-cgi/l/email-protection#a8c0cdc4c4c7e8dbcdc9c5c4cddbdbc1c6dccdcfdac9dcc1c7c6db86c1c7" class="btn btn-ghost">Email Us Directly</a>
+      <a href="spencersilva4246@gmail.com" class="btn btn-ghost">Email Us Directly</a>
     </div>
   </section>
 
@@ -371,11 +376,11 @@
       <a href="https://tally.so/r/7RoVZR" target="_blank">Get Started</a>
       <a href="#services">Services</a>
       <a href="#pricing">Pricing</a>
-      <a href="/cdn-cgi/l/email-protection#48202d242427083b2d2925242d3b3b21263c2d2f3a293c2127263b662127">Email</a>
+      <a href="mailto:hello@seamlessintegrations.io">Email</a>
     </div>
   </footer>
 
-  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  <script>
     const cursor = document.getElementById('cursor');
     const ring = document.getElementById('cursorRing');
     let mx = 0, my = 0, rx = 0, ry = 0;
@@ -399,4 +404,12 @@
     const observer = new IntersectionObserver(entries => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
-          setTimeout(() => entry.target.classList.add('vi
+          setTimeout(() => entry.target.classList.add('visible'), 80);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>
