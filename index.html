@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Seamless Integrations — Verkada Helix Integration Services</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --black: #080808; --white: #f5f5f0; --dim: #888880;
+      --border: rgba(245,245,240,0.1);
+      --font-display: 'Syne', sans-serif; --font-mono: 'DM Mono', monospace;
+    }
+    html { scroll-behavior: smooth; }
+    body { background: var(--black); color: var(--white); font-family: var(--font-display); overflow-x: hidden; cursor: none; }
+    body::before { content:''; position:fixed; inset:0; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E"); pointer-events:none; z-index:9000; opacity:0.4; }
+    .cursor { position:fixed; width:10px; height:10px; background:var(--white); border-radius:50%; pointer-events:none; z-index:9999; transform:translate(-50%,-50%); mix-blend-mode:difference; }
+    .cursor-ring { position:fixed; width:36px; height:36px; border:1px solid rgba(245,245,240,0.5); border-radius:50%; pointer-events:none; z-index:9998; transform:translate(-50%,-50%); transition:width 0.2s ease, height 0.2s ease; mix-blend-mode:difference; }
+
+    /* NAV */
+    nav { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; justify-content:space-between; align-items:center; padding:28px 48px; border-bottom:1px solid transparent; transition:border-color 0.3s, background 0.3s; }
+    nav.scrolled { border-color:var(--border); background:rgba(8,8,8,0.85); backdrop-filter:blur(12px); }
+    .nav-logo { display:flex; align-items:center; gap:14px; text-decoration:none; }
+    .nav-logo-icon { width:36px; height:36px; }
+    .nav-logo-text { font-family:var(--font-mono); font-size:13px; letter-spacing:0.08em; color:var(--dim); }
+    .nav-logo-text span { color:var(--white); }
+    .nav-links { display:flex; gap:36px; list-style:none; }
+    .nav-links a { font-family:var(--font-mono); font-size:12px; letter-spacing:0.1em; color:var(--dim); text-decoration:none; text-transform:uppercase; transition:color 0.2s; }
+    .nav-links a:hover { color:var(--white); }
+
+    /* HERO */
+    #hero { min-height:100vh; display:grid; grid-template-columns:1fr 1fr; align-items:center; padding:120px 48px 80px; gap:48px; position:relative; }
+    #hero::after { content:''; position:absolute; bottom:0; left:0; right:0; height:1px; background:var(--border); }
+    .hero-left { max-width:580px; }
+    .hero-label { font-family:var(--font-mono); font-size:11px; letter-spacing:0.2em; color:var(--dim); text-transform:uppercase; margin-bottom:28px; opacity:0; animation:fadeUp 0.6s 0.2s forwards; }
+    .hero-name { font-size:clamp(52px,7vw,96px); font-weight:800; line-height:0.95; letter-spacing:-0.03em; margin-bottom:32px; opacity:0; animation:fadeUp 0.7s 0.35s forwards; }
+    .hero-name em { font-style:normal; color:var(--dim); }
+    .hero-desc { font-family:var(--font-mono); font-size:14px; line-height:1.8; color:var(--dim); max-width:440px; margin-bottom:48px; opacity:0; animation:fadeUp 0.7s 0.5s forwards; }
+    .hero-cta { display:flex; gap:16px; flex-wrap:wrap; opacity:0; animation:fadeUp 0.7s 0.65s forwards; }
+    .btn { font-family:var(--font-mono); font-size:12px; letter-spacing:0.1em; text-transform:uppercase; text-decoration:none; padding:14px 28px; border:1px solid var(--white); color:var(--white); background:transparent; cursor:none; transition:background 0.2s, color 0.2s; display:inline-block; }
+    .btn:hover { background:var(--white); color:var(--black); }
+    .btn-ghost { border-color:var(--border); color:var(--dim); }
+    .btn-ghost:hover { border-color:var(--white); color:var(--white); background:transparent; }
+    .hero-right { display:flex; flex-direction:column; gap:20px; opacity:0; animation:fadeIn 1s 0.8s forwards; }
+    .stat-card { border:1px solid var(--border); padding:24px 28px; display:flex; justify-content:space-between; align-items:flex-end; }
+    .stat-num { font-size:48px; font-weight:800; line-height:1; letter-spacing:-0.04em; }
+    .stat-label { font-family:var(--font-mono); font-size:11px; letter-spacing:0.1em; color:var(--dim); text-transform:uppercase; text-align:right; max-width:140px; }
+    .badge-tag { font-family:var(--font-mono); font-size:11px; letter-spacing:0.15em; color:var(--dim); text-transform:uppercase; padding:12px 20px; border:1px solid var(--border); display:inline-block; align-self:flex-start; }
+
+    /* MARQUEE */
+    .marquee-wrap { overflow:hidden; border-top:1px solid var(--border); border-bottom:1px solid var(--border); padding:18px 0; white-space:nowrap; }
+    .marquee-track { display:inline-flex; animation:marquee 26s linear infinite; }
+    .marquee-item { font-family:var(--font-mono); font-size:12px; letter-spacing:0.15em; text-transform:uppercase; color:var(--dim); padding:0 40px; }
+    .marquee-item span { color:var(--white); }
+    @keyframes marquee { from { transform:translateX(0); } to { transform:translateX(-50%); } }
+
+    /* SECTIONS */
+    section { padding:120px 48px; border-bottom:1px solid var(--border); }
+    .section-label { font-family:var(--font-mono); font-size:11px; letter-spacing:0.2em; color:var(--dim); text-transform:uppercase; margin-bottom:64px; display:flex; align-items:center; gap:20px; }
+    .section-label::before { content:''; display:block; width:40px; height:1px; background:var(--dim); }
+    .section-title { font-size:clamp(32px,4vw,56px); font-weight:800; letter-spacing:-0.03em; line-height:1; }
+
+    /* HOW IT WORKS */
+    #how .steps-grid { margin-top:72px; display:flex; flex-direction:column; }
+    .step-item { display:grid; grid-template-columns:280px 1fr; gap:48px; padding:48px 0; border-top:1px solid var(--border); }
+    .step-item:last-child { border-bottom:1px solid var(--border); }
+    .step-num { font-size:72px; font-weight:800; letter-spacing:-0.05em; color:var(--border); line-height:1; }
+    .step-title { font-size:26px; font-weight:700; margin-bottom:16px; letter-spacing:-0.02em; }
+    .step-desc { font-family:var(--font-mono); font-size:13px; line-height:1.8; color:var(--dim); max-width:520px; }
+    .step-tags { display:flex; flex-wrap:wrap; gap:8px; margin-top:20px; }
+    .tag { font-family:var(--font-mono); font-size:10px; letter-spacing:0.1em; text-transform:uppercase; padding:5px 12px; border:1px solid var(--border); color:var(--dim); }
+
+    /* SERVICES */
+    #services { background:var(--white); color:var(--black); }
+    #services .section-label { color:rgba(8,8,8,0.4); }
+    #services .section-label::before { background:rgba(8,8,8,0.2); }
+    #services .section-title { color:var(--black); }
+    .services-grid { margin-top:72px; display:grid; grid-template-columns:1fr 1fr; gap:2px; background:rgba(8,8,8,0.1); }
+    .service-card { background:var(--white); padding:48px; }
+    .service-icon { font-size:32px; margin-bottom:24px; display:block; }
+    .service-name { font-size:28px; font-weight:800; letter-spacing:-0.03em; margin-bottom:8px; }
+    .service-sub { font-family:var(--font-mono); font-size:11px; letter-spacing:0.15em; text-transform:uppercase; color:rgba(8,8,8,0.4); margin-bottom:24px; }
+    .service-desc { font-family:var(--font-mono); font-size:13px; line-height:1.8; color:rgba(8,8,8,0.6); margin-bottom:28px; }
+    .service-features { list-style:none; display:flex; flex-direction:column; gap:10px; margin-bottom:32px; }
+    .service-features li { font-family:var(--font-mono); font-size:12px; line-height:1.6; color:rgba(8,8,8,0.65); padding-left:20px; position:relative; }
+    .service-features li::before { content:'—'; position:absolute; left:0; color:rgba(8,8,8,0.25); }
+    .service-price { display:flex; align-items:baseline; gap:8px; }
+    .price-num { font-size:44px; font-weight:800; letter-spacing:-0.04em; }
+    .price-label { font-family:var(--font-mono); font-size:11px; color:rgba(8,8,8,0.4); text-transform:uppercase; letter-spacing:0.1em; }
+
+    /* PRICING */
+    #pricing .pricing-grid { margin-top:72px; display:grid; grid-template-columns:repeat(2,1fr); border:1px solid var(--border); }
+    .price-card { padding:48px 36px; border-right:1px solid var(--border); position:relative; }
+    .price-card:last-child { border-right:none; }
+    .price-card.featured::before { content:'Most Popular'; position:absolute; top:-1px; left:36px; font-family:var(--font-mono); font-size:10px; letter-spacing:0.15em; text-transform:uppercase; background:var(--white); color:var(--black); padding:6px 14px; }
+    .plan-name { font-family:var(--font-mono); font-size:11px; letter-spacing:0.2em; text-transform:uppercase; color:var(--dim); margin-bottom:16px; }
+    .plan-price { font-size:52px; font-weight:800; letter-spacing:-0.04em; line-height:1; margin-bottom:6px; }
+    .plan-period { font-family:var(--font-mono); font-size:11px; color:var(--dim); letter-spacing:0.1em; margin-bottom:36px; }
+    .plan-divider { height:1px; background:var(--border); margin-bottom:28px; }
+    .plan-features { list-style:none; display:flex; flex-direction:column; gap:12px; }
+    .plan-features li { font-family:var(--font-mono); font-size:12px; line-height:1.6; color:var(--dim); padding-left:20px; position:relative; }
+    .plan-features li::before { content:'✓'; position:absolute; left:0; color:var(--white); font-size:10px; }
+    .plan-features li.muted { color:rgba(245,245,240,0.25); }
+    .plan-features li.muted::before { color:rgba(245,245,240,0.15); }
+
+    /* SECURITY */
+    #security { display:grid; grid-template-columns:1fr 1fr; gap:80px; align-items:center; }
+    .security-statement { font-size:clamp(28px,3.5vw,44px); font-weight:800; letter-spacing:-0.03em; line-height:1.1; margin-bottom:28px; }
+    .security-statement em { font-style:normal; color:var(--dim); }
+    .security-desc { font-family:var(--font-mono); font-size:13px; line-height:1.9; color:var(--dim); }
+    .cred-block { border:1px solid var(--border); padding:32px; display:flex; flex-direction:column; gap:0; }
+    .cred-item { display:flex; justify-content:space-between; align-items:center; padding:20px 0; border-bottom:1px solid var(--border); }
+    .cred-item:last-child { border-bottom:none; padding-bottom:0; }
+    .cred-item:first-child { padding-top:0; }
+    .cred-name { font-size:16px; font-weight:700; }
+    .cred-val { font-family:var(--font-mono); font-size:11px; color:var(--dim); letter-spacing:0.1em; text-transform:uppercase; }
+
+    /* CONTACT */
+    #contact { text-align:center; padding:120px 48px; border-bottom:none; }
+    .contact-title { font-size:clamp(48px,8vw,120px); font-weight:800; letter-spacing:-0.04em; line-height:0.9; margin-bottom:24px; }
+    .contact-title em { font-style:normal; color:var(--dim); }
+    .contact-sub { font-family:var(--font-mono); font-size:14px; color:var(--dim); line-height:1.8; max-width:480px; margin:0 auto 48px; }
+    .contact-links { display:flex; gap:16px; justify-content:center; flex-wrap:wrap; }
+
+    /* FOOTER */
+    footer { border-top:1px solid var(--border); padding:28px 48px; display:flex; justify-content:space-between; align-items:center; }
+    .footer-copy { font-family:var(--font-mono); font-size:11px; color:var(--dim); letter-spacing:0.05em; }
+    .footer-links { display:flex; gap:24px; }
+    .footer-links a { font-family:var(--font-mono); font-size:11px; color:var(--dim); text-decoration:none; letter-spacing:0.1em; text-transform:uppercase; transition:color 0.2s; }
+    .footer-links a:hover { color:var(--white); }
+
+    /* ANIMATIONS */
+    @keyframes fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+    .reveal { opacity:0; transform:translateY(32px); transition:opacity 0.7s ease, transform 0.7s ease; }
+    .reveal.visible { opacity:1; transform:translateY(0); }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      nav { padding:20px 24px; }
+      .nav-links { display:none; }
+      #hero { grid-template-columns:1fr; padding:100px 24px 60px; }
+      .hero-right { display:none; }
+      section { padding:80px 24px; }
+      .step-item { grid-template-columns:1fr; gap:16px; }
+      .services-grid { grid-template-columns:1fr; }
+      #pricing .pricing-grid { grid-template-columns:1fr; }
+      .price-card { border-right:none; border-bottom:1px solid var(--border); }
+      #security { grid-template-columns:1fr; gap:48px; }
+      .contact-title { font-size:48px; }
+      footer { flex-direction:column; gap:16px; text-align:center; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+
+  <nav id="nav">
+    <a href="#" class="nav-logo">
+      <svg class="nav-logo-icon" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="18" cy="18" r="16" stroke="rgba(245,245,240,0.15)" stroke-width="2"/>
+        <circle cx="18" cy="18" r="16" fill="none" stroke="#f5f5f0" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="72 28" stroke-dashoffset="18"/>
+        <rect x="11" y="19" width="14" height="11" rx="2" fill="#f5f5f0"/>
+        <path d="M13 19 L13 15 Q13 11 18 11 Q23 11 23 15 L23 19" fill="none" stroke="#f5f5f0" stroke-width="2.2" stroke-linecap="round"/>
+        <circle cx="18" cy="23" r="1.5" fill="#080808"/>
+        <rect x="17" y="23.5" width="2" height="3" rx="0.5" fill="#080808"/>
+      </svg>
+      <span class="nav-logo-text">Seamless <span>Integrations</span></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#how">How It Works</a></li>
+      <li><a href="#services">Services</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+      <li><a href="#contact">Get Started</a></li>
+    </ul>
+  </nav>
+
+  <section id="hero">
+    <div class="hero-left">
+      <p class="hero-label">Verkada Helix Integration Specialist</p>
+      <h1 class="hero-name">Connect.<br/><em>Search.</em><br/>Done.</h1>
+      <p class="hero-desc">Link your Square POS or Avigilon Alta access control to Verkada Helix. Search any transaction or door event and jump straight to the footage — in seconds, not hours.</p>
+      <div class="hero-cta">
+        <a href="https://tally.so/r/7RoVZR" target="_blank" class="btn">Get Started</a>
+        <a href="#services" class="btn btn-ghost">See Services</a>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="badge-tag">Powered by AWS Lambda — Serverless</div>
+      <div class="stat-card">
+        <div class="stat-num">2–3s</div>
+        <div class="stat-label">From event to searchable footage</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">$0</div>
+        <div class="stat-label">Monthly AWS cost for most clients</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">0</div>
+        <div class="stat-label">Impact on existing systems</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="marquee-wrap">
+    <div class="marquee-track">
+      <span class="marquee-item"><span>Verkada Helix</span></span>
+      <span class="marquee-item">Square POS</span>
+      <span class="marquee-item"><span>Avigilon Alta</span></span>
+      <span class="marquee-item">AWS Lambda</span>
+      <span class="marquee-item"><span>Real-Time Events</span></span>
+      <span class="marquee-item">Webhook Integration</span>
+      <span class="marquee-item"><span>Loss Prevention</span></span>
+      <span class="marquee-item">Access Control</span>
+      <span class="marquee-item"><span>Video Search</span></span>
+      <span class="marquee-item">Serverless Architecture</span>
+      <span class="marquee-item"><span>Verkada Helix</span></span>
+      <span class="marquee-item">Square POS</span>
+      <span class="marquee-item"><span>Avigilon Alta</span></span>
+      <span class="marquee-item">AWS Lambda</span>
+      <span class="marquee-item"><span>Real-Time Events</span></span>
+      <span class="marquee-item">Webhook Integration</span>
+      <span class="marquee-item"><span>Loss Prevention</span></span>
+      <span class="marquee-item">Access Control</span>
+      <span class="marquee-item"><span>Video Search</span></span>
+      <span class="marquee-item">Serverless Architecture</span>
+    </div>
+  </div>
+
+  <section id="how">
+    <div class="section-label reveal">Process</div>
+    <h2 class="section-title reveal">How It<br/>Works.</h2>
+    <div class="steps-grid">
+      <div class="step-item reveal">
+        <div class="step-num">01</div>
+        <div class="step-body">
+          <div class="step-title">You fill out the intake form</div>
+          <p class="step-desc">Tell us which systems you're running, how many locations, and what you want to be able to search. Takes under two minutes. We review it and reach out within 24 hours to confirm scope and pricing.</p>
+          <div class="step-tags"><span class="tag">2 min form</span><span class="tag">24hr response</span></div>
+        </div>
+      </div>
+      <div class="step-item reveal">
+        <div class="step-num">02</div>
+        <div class="step-body">
+          <div class="step-title">We build it under your AWS account</div>
+          <p class="step-desc">Everything is deployed to your own AWS account — not ours. We set up the Lambda function, API Gateway endpoint, Helix event types, and webhook configuration. You own the infrastructure, you own the cost.</p>
+          <div class="step-tags"><span class="tag">AWS Lambda</span><span class="tag">API Gateway</span><span class="tag">Verkada Helix</span></div>
+        </div>
+      </div>
+      <div class="step-item reveal">
+        <div class="step-num">03</div>
+        <div class="step-body">
+          <div class="step-title">We test end-to-end before handoff</div>
+          <p class="step-desc">We fire test events, verify they appear in Verkada Command with the correct attributes, and confirm the video link lands on the right moment. Nothing is handed off until it works exactly as expected.</p>
+          <div class="step-tags"><span class="tag">CloudWatch verified</span><span class="tag">Live footage test</span></div>
+        </div>
+      </div>
+      <div class="step-item reveal">
+        <div class="step-num">04</div>
+        <div class="step-body">
+          <div class="step-title">Your team searches. Instantly.</div>
+          <p class="step-desc">From that point on, your staff opens Verkada Command, searches by transaction number, employee name, door, or any attribute you configured — and the video jumps to that exact moment. No scrubbing. No guessing.</p>
+          <div class="step-tags"><span class="tag">Verkada Command</span><span class="tag">Instant search</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="services">
+    <div class="section-label reveal">What We Connect</div>
+    <h2 class="section-title reveal">Two integrations.<br/>One specialist.</h2>
+    <div class="services-grid reveal">
+      <div class="service-card">
+        <span class="service-icon">🛒</span>
+        <div class="service-name">Square POS</div>
+        <div class="service-sub">→ Verkada Helix</div>
+        <p class="service-desc">Every completed sale becomes a searchable Helix event linked to your camera footage. Search by order number, item, amount, or cashier — and pull up the video in seconds.</p>
+        <ul class="service-features">
+          <li>AWS Lambda + API Gateway setup</li>
+          <li>Square webhook configuration</li>
+          <li>Custom Helix event type creation</li>
+          <li>Searchable by order, item, price, cashier</li>
+          <li>End-to-end testing and client walkthrough</li>
+        </ul>
+        <div class="service-price">
+          <span class="price-num">$75</span>
+          <span class="price-label">/ hour</span>
+        </div>
+      </div>
+      <div class="service-card">
+        <span class="service-icon">🪪</span>
+        <div class="service-name">Avigilon Alta</div>
+        <div class="service-sub">Access Control → Verkada Helix</div>
+        <p class="service-desc">Every door access event becomes a searchable Helix event tied to your camera. Search by employee name, door, or result and see who walked through and when.</p>
+        <ul class="service-features">
+          <li>AWS Lambda + API Gateway setup</li>
+          <li>Alta Rule and webhook configuration</li>
+          <li>Helix event type with access attributes</li>
+          <li>Multi-door support (up to 3 doors included)</li>
+          <li>End-to-end testing and client walkthrough</li>
+        </ul>
+        <div class="service-price">
+          <span class="price-num">$75</span>
+          <span class="price-label">/ hour</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="pricing">
+    <div class="section-label reveal">Monthly Plans</div>
+    <h2 class="section-title reveal">Stay covered<br/>after launch.</h2>
+    <p class="reveal" style="font-family:var(--font-mono);font-size:14px;color:var(--dim);line-height:1.8;max-width:520px;margin-top:24px;">Optional monthly plans for monitoring, updates, and support. Your integration runs on your own AWS — these plans keep it healthy.</p>
+    <div class="pricing-grid reveal">
+      <div class="price-card">
+        <div class="plan-name">Starter</div>
+        <div class="plan-price">$19</div>
+        <div class="plan-period">/ month</div>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li>CloudWatch error monitoring</li>
+          <li>API key expiration alerts</li>
+          <li>Email support — 48hr response</li>
+          <li>Up to 1 integration</li>
+          <li class="muted">Lambda code updates</li>
+          <li class="muted">Phone support</li>
+          <li class="muted">Quarterly health check</li>
+        </ul>
+      </div>
+      <div class="price-card featured">
+        <div class="plan-name">Professional</div>
+        <div class="plan-price">$35</div>
+        <div class="plan-period">/ month</div>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li>Everything in Starter</li>
+          <li>Priority email — 24hr response</li>
+          <li>Lambda code updates included</li>
+          <li>Quarterly integration health check</li>
+          <li>Up to 3 integrations</li>
+          <li>Phone support</li>
+          <li>Monthly performance report</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="security">
+    <div class="security-left reveal">
+      <div class="section-label">Why Trust Us</div>
+      <h2 class="security-statement">Security isn't<br/>an afterthought.<br/><em>It's the job.</em></h2>
+      <p class="security-desc">The person building your integration is a working Security Analyst. Every integration is built with proper authentication, signature verification, and secure credential handling — not just functional code, but code that takes your security seriously.</p>
+    </div>
+    <div class="security-right reveal">
+      <div class="cred-block">
+        <div class="section-label" style="margin-bottom:24px;">Background</div>
+        <div class="cred-item"><span class="cred-name">Role</span><span class="cred-val">Security Analyst</span></div>
+        <div class="cred-item"><span class="cred-name">Compliance</span><span class="cred-val">SOC II Experience</span></div>
+        <div class="cred-item"><span class="cred-name">Speciality</span><span class="cred-val">Incident Response</span></div>
+        <div class="cred-item"><span class="cred-name">Architecture</span><span class="cred-val">Serverless / AWS</span></div>
+        <div class="cred-item"><span class="cred-name">Your Data</span><span class="cred-val">Stays on your infra</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact">
+    <h2 class="contact-title reveal">Ready to<br/><em>sync up?</em></h2>
+    <p class="contact-sub reveal">Fill out the intake form — takes under 2 minutes. We'll review your setup and get back to you within 24 hours with a confirmed quote.</p>
+    <div class="contact-links reveal">
+      <a href="https://tally.so/r/7RoVZR" target="_blank" class="btn">Start Intake Form</a>
+      <a href="mailto:hello@seamlessintegrations.io" class="btn btn-ghost">Email Us Directly</a>
+    </div>
+  </section>
+
+  <footer>
+    <span class="footer-copy">© 2026 Seamless Integrations. All rights reserved.</span>
+    <div class="footer-links">
+      <a href="https://tally.so/r/7RoVZR" target="_blank">Get Started</a>
+      <a href="#services">Services</a>
+      <a href="#pricing">Pricing</a>
+      <a href="mailto:hello@seamlessintegrations.io">Email</a>
+    </div>
+  </footer>
+
+  <script>
+    const cursor = document.getElementById('cursor');
+    const ring = document.getElementById('cursorRing');
+    let mx = 0, my = 0, rx = 0, ry = 0;
+    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+    function animateCursor() {
+      cursor.style.left = mx + 'px';
+      cursor.style.top = my + 'px';
+      rx += (mx - rx) * 0.12;
+      ry += (my - ry) * 0.12;
+      ring.style.left = rx + 'px';
+      ring.style.top = ry + 'px';
+      requestAnimationFrame(animateCursor);
+    }
+    animateCursor();
+    document.querySelectorAll('a, button, .btn').forEach(el => {
+      el.addEventListener('mouseenter', () => { ring.style.width = '56px'; ring.style.height = '56px'; });
+      el.addEventListener('mouseleave', () => { ring.style.width = '36px'; ring.style.height = '36px'; });
+    });
+    const nav = document.getElementById('nav');
+    window.addEventListener('scroll', () => { nav.classList.toggle('scrolled', window.scrollY > 40); });
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          setTimeout(() => entry.target.classList.add('visible'), 80);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>
