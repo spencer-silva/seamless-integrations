@@ -165,21 +165,119 @@
     .reveal { opacity:0; transform:translateY(32px); transition:opacity 0.7s ease, transform 0.7s ease; }
     .reveal.visible { opacity:1; transform:translateY(0); }
 
-    /* RESPONSIVE */
-    @media (max-width: 900px) {
-      nav { padding:20px 24px; }
+    /* ── HAMBURGER (hidden on desktop) ── */
+    .nav-hamburger {
+      display:none; flex-direction:column; justify-content:center; gap:5px;
+      width:36px; height:36px; background:none; border:none; cursor:pointer;
+      padding:4px; z-index:200;
+    }
+    .nav-hamburger span {
+      display:block; width:100%; height:1px; background:var(--white);
+      transition:transform 0.3s ease, opacity 0.3s ease;
+      transform-origin:center;
+    }
+    .nav-hamburger.open span:nth-child(1) { transform:translateY(6px) rotate(45deg); }
+    .nav-hamburger.open span:nth-child(2) { opacity:0; }
+    .nav-hamburger.open span:nth-child(3) { transform:translateY(-6px) rotate(-45deg); }
+
+    /* Mobile nav drawer */
+    .mobile-nav {
+      display:none; position:fixed; inset:0; background:rgba(8,8,8,0.97);
+      z-index:150; flex-direction:column; align-items:center; justify-content:center;
+      gap:40px; opacity:0; transition:opacity 0.3s ease;
+    }
+    .mobile-nav.open { opacity:1; }
+    .mobile-nav a {
+      font-family:var(--font-mono); font-size:20px; letter-spacing:0.12em;
+      text-transform:uppercase; color:var(--dim); text-decoration:none;
+      transition:color 0.2s; padding:8px 0;
+    }
+    .mobile-nav a:active { color:var(--white); }
+
+    /* ── TABLET (901px – 1200px) ── */
+    @media (min-width:901px) and (max-width:1200px) {
+      nav { padding:24px 36px; }
+      #hero { padding:100px 36px 70px; gap:36px; }
+      .hero-logo-img { width:180px; height:180px; }
+      .hero-logo-wordmark-main { font-size:22px; }
+      .hero-name { font-size:clamp(56px,7vw,88px); }
+      section { padding:100px 36px; }
+      .step-item { grid-template-columns:200px 1fr; gap:32px; }
+      .service-card { padding:36px; }
+      #security { gap:48px; }
+      footer { padding:24px 36px; }
+    }
+
+    /* ── MOBILE (≤ 900px) ── */
+    @media (max-width:900px) {
+      .cursor, .cursor-ring { display:none; }
+      body { cursor:auto; }
+      .btn { cursor:pointer; }
+
+      nav { padding:16px 20px; }
       .nav-links { display:none; }
-      #hero { grid-template-columns:1fr; padding:100px 24px 60px; }
-      .hero-right { margin-top:8px; }
-      .hero-name { font-size:clamp(56px,14vw,80px); }
-      section { padding:80px 24px; }
-      .step-item { grid-template-columns:1fr; gap:16px; }
+      .nav-hamburger { display:flex; }
+
+      #hero {
+        grid-template-columns:1fr;
+        min-height:auto;
+        padding:90px 20px 60px;
+        gap:36px;
+      }
+      .hero-left { max-width:100%; align-items:center; text-align:center; }
+      .hero-logo-img { width:160px; height:160px; }
+      .hero-logo-wordmark-main { font-size:22px; }
+      .hero-logo-wordmark-sub { font-size:10px; }
+      .hero-label { text-align:center; }
+      .hero-desc { text-align:center; max-width:100%; font-size:13px; }
+      .hero-cta { justify-content:center; }
+      .hero-right { order:-1; text-align:center; justify-content:center; align-items:center; }
+      .hero-name { font-size:clamp(52px,14vw,80px); text-align:center; }
+
+      section { padding:64px 20px; }
+      .section-label { margin-bottom:40px; }
+
+      .step-item { grid-template-columns:1fr; gap:12px; padding:32px 0; }
+      .step-num { font-size:48px; }
+      .step-title { font-size:20px; }
+
       .services-grid { grid-template-columns:1fr; }
+      .service-card { padding:32px 24px; }
+      .service-name { font-size:22px; }
+      .price-num { font-size:36px; }
+
       #pricing .pricing-grid { grid-template-columns:1fr; }
-      .price-card { border-right:none; border-bottom:1px solid var(--border); }
-      #security { grid-template-columns:1fr; gap:48px; }
-      .contact-title { font-size:48px; }
-      footer { flex-direction:column; gap:16px; text-align:center; }
+      .price-card { border-right:none; border-bottom:1px solid var(--border); padding:36px 24px; }
+      .price-card:last-child { border-bottom:none; }
+      .plan-price { font-size:44px; }
+
+      #security { grid-template-columns:1fr; gap:40px; padding:64px 20px; }
+      .security-statement { font-size:clamp(24px,7vw,36px); }
+      .cred-item { flex-wrap:wrap; gap:4px; }
+
+      #contact { padding:80px 20px; }
+      .contact-title { font-size:clamp(40px,12vw,72px); }
+      .contact-sub { font-size:13px; }
+      .contact-links { flex-direction:column; align-items:center; }
+      .contact-links .btn { width:100%; text-align:center; max-width:320px; }
+
+      footer { padding:24px 20px; flex-direction:column; gap:16px; text-align:center; }
+      .footer-links { flex-wrap:wrap; justify-content:center; gap:16px; }
+    }
+
+    /* ── SMALL MOBILE (≤ 480px) ── */
+    @media (max-width:480px) {
+      .hero-logo-img { width:130px; height:130px; }
+      .hero-name { font-size:clamp(44px,16vw,64px); }
+      .hero-logo-wordmark-main { font-size:18px; }
+      .hero-desc { font-size:12px; }
+      .btn { padding:12px 20px; font-size:11px; }
+      .section-title { font-size:clamp(28px,8vw,40px); }
+      .step-num { font-size:40px; }
+      .step-title { font-size:18px; }
+      .service-card { padding:24px 16px; }
+      .plan-price { font-size:38px; }
+      .contact-title { font-size:clamp(36px,13vw,56px); }
     }
   </style>
 </head>
@@ -199,7 +297,18 @@
       <li><a href="#pricing">Pricing</a></li>
       <li><a href="#contact">Get Started</a></li>
     </ul>
+    <button class="nav-hamburger" id="hamburger" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
   </nav>
+
+  <!-- Mobile nav drawer -->
+  <div class="mobile-nav" id="mobileNav">
+    <a href="#how" class="mobile-link">How It Works</a>
+    <a href="#services" class="mobile-link">Services</a>
+    <a href="#pricing" class="mobile-link">Pricing</a>
+    <a href="#contact" class="mobile-link">Get Started</a>
+  </div>
 
   <section id="hero">
     <!-- LEFT: Logo lockup + descriptor + CTA -->
@@ -391,7 +500,7 @@
     <p class="contact-sub reveal">Fill out the intake form — takes under 2 minutes. We'll review your setup and get back to you within 24 hours with a confirmed quote.</p>
     <div class="contact-links reveal">
       <a href="https://tally.so/r/7RoVZR" target="_blank" class="btn">Start Intake Form</a>
-      <a href="mailto:spencersilva4246@gmail.com" class="btn btn-ghost">Email Us Directly</a>
+      <a href="/cdn-cgi/l/email-protection#f784879299949285849e9b8196c3c5c3c1b7909a969e9bd994989a" class="btn btn-ghost">Email Us Directly</a>
     </div>
   </section>
 
@@ -401,11 +510,11 @@
       <a href="https://tally.so/r/7RoVZR" target="_blank">Get Started</a>
       <a href="#services">Services</a>
       <a href="#pricing">Pricing</a>
-      <a href="mailto:spencersilva4246@gmail.com">Email</a>
+      <a href="/cdn-cgi/l/email-protection#2c5f5c49424f495e5f45405a4d181e181a6c4b414d4540024f4341">Email</a>
     </div>
   </footer>
 
-  <script>
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
     const cursor = document.getElementById('cursor');
     const ring = document.getElementById('cursorRing');
     let mx = 0, my = 0, rx = 0, ry = 0;
@@ -435,6 +544,28 @@
       });
     }, { threshold: 0.1 });
     document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // Hamburger menu
+    const hamburger = document.getElementById('hamburger');
+    const mobileNav = document.getElementById('mobileNav');
+    function openMenu() {
+      mobileNav.style.display = 'flex';
+      requestAnimationFrame(() => mobileNav.classList.add('open'));
+      hamburger.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeMenu() {
+      mobileNav.classList.remove('open');
+      hamburger.classList.remove('open');
+      document.body.style.overflow = '';
+      setTimeout(() => { if (!mobileNav.classList.contains('open')) mobileNav.style.display = 'none'; }, 300);
+    }
+    hamburger.addEventListener('click', () => {
+      hamburger.classList.contains('open') ? closeMenu() : openMenu();
+    });
+    document.querySelectorAll('.mobile-link').forEach(link => {
+      link.addEventListener('click', closeMenu);
+    });
   </script>
 </body>
 </html>
